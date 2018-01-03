@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Stabryla.Libs.ServerLib</id>
+    <version>1.0.2</version>
+    <title>$title$</title>
+    <authors>Morteniusz</authors>
+    <owners>$author$</owners>
+    <projectUrl>https://github.com/MStabryla/ServerLib</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Smart library to create simply server with many clients</description>
+    <releaseNotes>Add Comments</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>server socket client tcp</tags>
+  </metadata>
+</package>

@@ -1,0 +1,17 @@
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Console\ServerLib\bin\Debug\ServerLib.dll
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Console\ServerLib\bin\Debug\ServerLib.pdb
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Console\ServerLib\obj\Debug\ServerLib.csprojResolveAssemblyReference.cache
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Console\ServerLib\obj\Debug\ServerLib.csproj.CoreCompileInputs.cache
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Console\ServerLib\obj\Debug\ServerLib.dll
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Console\ServerLib\obj\Debug\ServerLib.pdb
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\bin\Debug\ServerLib.dll
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\bin\Debug\ServerLib.pdb
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\obj\Debug\ServerLib.csprojResolveAssemblyReference.cache
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\obj\Debug\ServerLib.csproj.CoreCompileInputs.cache
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\obj\Debug\ServerLib.dll
+C:\Users\maatt\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\obj\Debug\ServerLib.pdb
+C:\Users\Morteniusz\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\bin\Debug\ServerLib.dll
+C:\Users\Morteniusz\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\bin\Debug\ServerLib.pdb
+C:\Users\Morteniusz\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\obj\Debug\ServerLib.csprojResolveAssemblyReference.cache
+C:\Users\Morteniusz\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\obj\Debug\ServerLib.dll
+C:\Users\Morteniusz\OneDrive\PROGRAMOWANIE\C#\Libs\ServerLib\obj\Debug\ServerLib.pdb
