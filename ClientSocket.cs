@@ -5,6 +5,11 @@ using System.Linq;
 
 namespace ServerLib
 {
+    /// <summary>
+    /// Special class which contains Socket class and method to maintain a connection ( used in both modes ).
+    /// </summary>
+    /// <typeparam name="IProtoco">The class type inherited from IProtocol class with specified data class type.</typeparam>
+    /// <typeparam name="T">The data class type which your server ( and other classes too ) will use to store data.</typeparam>
     public class ClientSocket<IProtoco, T> where IProtoco : IProtocol<T>
     {
 
@@ -17,23 +22,45 @@ namespace ServerLib
         private Socket Client { get; set; }
         private byte[] Buffer { get; set; }
         private IProtocol<T> ProtocolHandler { get; set; }
+        /// <summary>
+        /// Create an instance of ClientSocket with IpAddress and port. Contructor starts an connection with external host ( used in Client Mode ).
+        /// </summary>
+        /// <param name="addr">Ip Address of server.</param>
+        /// <param name="dPort">Port Connection of server.</param>
+        /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
         public ClientSocket(IPAddress addr,int dPort,IProtocol<T> protocolHandler)
         {
             ProtocolHandler = protocolHandler;
             Buffer = new byte[1024];
             RealConnect(addr, dPort);
         }
-        public ClientSocket(bool autoConnect, IProtocol<T> protocolHandler)
+        /// <summary>
+        /// Create an instance of ClientSocket without receiving an active connection ( used in Client Mode ) ( using RealConnect method required ).
+        /// </summary>
+        /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
+        public ClientSocket(IProtocol<T> protocolHandler)
         {
             ProtocolHandler = protocolHandler;
             Buffer = new byte[1024];
         }
+        /// <summary>
+        /// Create an instance of ClientSocket with IpAddress and port. Contructor starts an connection with external host ( used in Client Mode ). Additionany this contructor contains information about buffer size.
+        /// </summary>
+        /// <param name="addr">Ip Address of server.</param>
+        /// <param name="dPort">Port Connection of server.</param>
+        /// <param name="bufferSize">Size of byte array whick contains bytes from external host.</param>
+        /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
         public ClientSocket(IPAddress addr, int dPort,int bufferSize, IProtocol<T> protocolHandler)
         {
             ProtocolHandler = protocolHandler;
             Buffer = new byte[bufferSize];
             RealConnect(addr, dPort);
         }
+        /// <summary>
+        /// Create an instance of ClientSocket with active Socket connection ( used in Server Mode ).
+        /// </summary>
+        /// <param name="client">Active connection with the client.</param>
+        /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
         public ClientSocket(Socket client, IProtocol<T> protocolHandler) 
         {
             Client = client;
@@ -41,6 +68,12 @@ namespace ServerLib
             ProtocolHandler = protocolHandler;
             Buffer = new byte[1024];
         }
+        /// <summary>
+        /// Create an instance of ClientSocket with active Socket connection ( used in Server Mode ). Additionany this contructor contains special callback function.
+        /// </summary>
+        /// <param name="client">Active connection with the client.</param>
+        /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
+        /// <param name="callback">Function which will be added to OnReceiveSocketEvent event.</param>
         public ClientSocket(Socket client, IProtocol<T> protocolHandler, OnReceiveSocketEventHandler<T> callback)
         {
             Client = client;
@@ -49,6 +82,26 @@ namespace ServerLib
             ProtocolHandler = protocolHandler;
             OnReceiveSocketEvent += callback;
         }
+        /// <summary>
+        /// Create an instance of ClientSocket with active Socket connection ( used in Server Mode ). Additionany this contructor contains information about buffer size.
+        /// </summary>
+        /// <param name="client">Active connection with the client.</param>
+        /// <param name="bufferSize">Size of byte array whick contains bytes from external host.</param>
+        /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
+        public ClientSocket(Socket client,int bufferSize, IProtocol<T> protocolHandler)
+        {
+            Client = client;
+            //TryBindingScoket(Client);
+            ProtocolHandler = protocolHandler;
+            Buffer = new byte[bufferSize];
+        }
+        /// <summary>
+        /// Create an instance of ClientSocket with active Socket connection ( used in Server Mode ). Additionany this contructor contains information about buffer size and special callback function.
+        /// </summary>
+        /// <param name="client">Active connection with the client.</param>
+        /// <param name="bufferSize">Size of byte array whick contains bytes from external host.</param>
+        /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
+        /// <param name="callback">Function which will be added to OnReceiveSocketEvent event.</param>
         public ClientSocket(Socket client, int bufferSize, IProtocol<T> protocolHandler, OnReceiveSocketEventHandler<T> callback)
         {
             Client = client;
@@ -57,6 +110,9 @@ namespace ServerLib
             ProtocolHandler = protocolHandler;
             OnReceiveSocketEvent += callback;
         }
+        /// <summary>
+        /// This starts triggers an OnStartListening event and start Receiving function
+        /// </summary>
         public void StartListening()
         {
             if (OnStartListeningEvent != null)
@@ -65,6 +121,9 @@ namespace ServerLib
             }
             Receiving();
         }
+        /// <summary>
+        /// Recursive function which is trying to receive data from external host.
+        /// </summary>
         private void Receiving()
         {
             try
@@ -91,6 +150,10 @@ namespace ServerLib
                 }
             }
         }
+        /// <summary>
+        /// Method added to BeginReceive function as a callback. This method move data bytes to uffer array and encode it to T type object. Next it's trigger OnReceiveSocket event.
+        /// </summary>
+        /// <param name="result"></param>
         private void OnReceiving(IAsyncResult result)
         {
             try
@@ -113,23 +176,39 @@ namespace ServerLib
                 Receiving();
             }
         }
+        /// <summary>
+        /// Method used to connect with external host.
+        /// </summary>
+        /// <param name="REP">Full Address of external host.</param>
         public void Connect(IPEndPoint REP)
         {
             Client.Connect(REP);
         }
+        /// <summary>
+        /// Method used to connect with external host.
+        /// </summary>
+        /// <param name="REP">IP Address of external host.</param>
+        /// <param name="port">Port Connection of external host.</param>
         public void Connect(IPAddress REP,int port)
         {
             Client.Connect(REP,port);
         }
+        /// <summary>
+        /// Method used to sendingan message in T type to external host. Thism ethod triggers an SendMessage event.
+        /// </summary>
+        /// <param name="message">T type object contains data to send</param>
         public void SendMessage(T message)
         {
             if (OnSendSocketEvent != null)
             {
                 OnSendSocketEvent(this, new SocketSendEventArgs<T>(message));
             }
-            byte[] byteMessage = ProtocolHandler.CodeProtocol(message);
+            byte[] byteMessage = ProtocolHandler.EncodeProtocol(message);
             Client.Send(byteMessage, 0, byteMessage.Length, SocketFlags.None);
         }
+        /// <summary>
+        /// Method to disconnecting client
+        /// </summary>
         public void ShutDown()
         {
             if (OnShutDownEvent != null)
