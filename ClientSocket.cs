@@ -165,6 +165,7 @@ namespace ServerLib
                     byte[] realBuffer = CutArray(Buffer, realCountByteBuffer);
                     T response = ProtocolHandler.DecodeProtocol(realBuffer);
                     OnReceiveSocketEvent?.Invoke(this, new SocketReceiveEventArgs<T>(response));
+                    ClearBuffer(Buffer);
                 }
             }
             catch (Exception ex)
@@ -241,6 +242,11 @@ namespace ServerLib
                 newBuffer[i] = buffer[i];
             }
             return newBuffer;
+        }
+        private static void ClearBuffer(byte[] buffer)
+        {
+            for (int i = 0; i < buffer.Length; i++)
+                buffer[i] = 0;
         }
         public static ClientSocket<IProtoco, T> GetClient(Socket socket, IProtoco protocol)
         {
