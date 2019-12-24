@@ -17,7 +17,7 @@ namespace ServerLib
         /// Create new instance of ListenSocket class. This object will listening on provided address.
         /// </summary>
         /// <param name="client">Address on which this socket will be listening.</param>
-        public ListenSocket(IPEndPoint client) : base(AddressFamily.Unspecified, SocketType.Stream, ProtocolType.Tcp)
+        public ListenSocket(IPEndPoint client) : base(client.AddressFamily, SocketType.Stream, ProtocolType.Tcp)
         {
             Client = client;
             

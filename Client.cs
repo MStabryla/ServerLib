@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Threading.Tasks;
 
 namespace ServerLib
 {
@@ -50,6 +51,10 @@ namespace ServerLib
         public bool SocketConnect(IPAddress addr,int dPort)
         {
             return Socket.RealConnect(addr, dPort);
+        }
+        public async Task<bool> SocketConnectAsync(IPAddress addr,int dPort)
+        {
+            return await Socket.RealConnectAsync(addr, dPort);
         }
     }
 }

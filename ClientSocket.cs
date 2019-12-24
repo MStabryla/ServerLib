@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Net;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ServerLib
 {
@@ -273,6 +274,49 @@ namespace ServerLib
                             s.Bind(endP);
                             s.Connect(addr, dPort);
                             Client = s;
+                            Receiving();
+                            return true;
+                        }
+                        catch (Exception)
+                        {
+
+                        }
+                    }
+                    if (!Completed)
+                    {
+                        throw new Exception();
+                    }
+                }
+                catch
+                {
+                    startPort++;
+                    Client = null;
+                }
+            }
+            return false;
+        }
+        public async Task<bool> RealConnectAsync(IPAddress addr,int dPort,int startPort = 6560)
+        {
+            if (Client != null && Client.Connected)
+            {
+                return true;
+            }
+            IPAddress[] temAddresses = Dns.GetHostEntry(Environment.MachineName).AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork).ToArray();
+            bool Completed = false;
+            while (!Completed && startPort < 6600)
+            {
+                try
+                {
+                    foreach (IPAddress temIp in temAddresses)
+                    {
+                        try
+                        {
+                            var localEndPoint = new IPEndPoint(temIp.MapToIPv4(), startPort);
+                            var remoteEndPoint = new IPEndPoint(addr.MapToIPv4(),dPort);
+                            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                            socket.Bind(localEndPoint);
+                            await socket.ConnectAsync(addr, dPort);
+                            Client = socket;
                             Receiving();
                             return true;
                         }
