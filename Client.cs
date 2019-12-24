@@ -52,6 +52,12 @@ namespace ServerLib
         {
             return Socket.RealConnect(addr, dPort);
         }
+        /// <summary>
+        /// This function is trying to asynchronously establish the connection with external host using IPAddress and port number ( used in Client Mode ).
+        /// </summary>
+        /// <param name="addr">The IP Address with which this client will be connected.</param>
+        /// <param name="dPort">The Port number on which this client will be connected.</param>
+        /// <returns>Information about reaching connection success</returns>
         public async Task<bool> SocketConnectAsync(IPAddress addr,int dPort)
         {
             return await Socket.RealConnectAsync(addr, dPort);
