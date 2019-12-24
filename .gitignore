@@ -6,3 +6,5 @@
 /obj/Debug
 /bin/Debug
 /.vs/ServerLib/v14
+*.nuspec
+*.config
