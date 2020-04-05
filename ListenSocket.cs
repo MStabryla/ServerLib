@@ -58,11 +58,12 @@ namespace ServerLib
         /// <param name="result"></param>
         private void OnListenig(IAsyncResult result)
         {
-            Listening();
             if (OnListenEvent != null)
             {
                 OnListenEvent(this, new AsyncEventArgs(result));
             }
+            Listening();
+            
         }
         /// <summary>
         /// Method which triggers OnShutDownEvent and close actual connection.

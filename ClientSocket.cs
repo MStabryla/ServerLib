@@ -20,11 +20,11 @@ namespace ServerLib
         public event OnSendSocketEventHandler<T> OnSendSocketEvent;
         public event OnShutDownEventHandler OnShutDownEvent;
 
-        private Socket Client { get; set; }
+        private Socket Socket { get; set; }
         private byte[] Buffer { get; set; }
         private IProtocol<T> ProtocolHandler { get; set; }
         /// <summary>
-        /// Create an instance of ClientSocket with IpAddress and port. Contructor starts an connection with external host ( used in Client Mode ).
+        /// Create an instance of ClientSocket with IpAddress and port. Contructor starts connection with external host ( used in Client Mode ).
         /// </summary>
         /// <param name="addr">Ip Address of server.</param>
         /// <param name="dPort">Port Connection of server.</param>
@@ -64,8 +64,7 @@ namespace ServerLib
         /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
         public ClientSocket(Socket client, IProtocol<T> protocolHandler) 
         {
-            Client = client;
-            //TryBindingScoket(Client);
+            Socket = client;
             ProtocolHandler = protocolHandler;
             Buffer = new byte[1024];
         }
@@ -77,8 +76,7 @@ namespace ServerLib
         /// <param name="callback">Function which will be added to OnReceiveSocketEvent event.</param>
         public ClientSocket(Socket client, IProtocol<T> protocolHandler, OnReceiveSocketEventHandler<T> callback)
         {
-            Client = client;
-            //TryBindingScoket(Client);
+            Socket = client;
             Buffer = new byte[1024];
             ProtocolHandler = protocolHandler;
             OnReceiveSocketEvent += callback;
@@ -91,7 +89,7 @@ namespace ServerLib
         /// <param name="protocolHandler">Interface responsible for encoding nad decoding messages.</param>
         public ClientSocket(Socket client,int bufferSize, IProtocol<T> protocolHandler)
         {
-            Client = client;
+            Socket = client;
             //TryBindingScoket(Client);
             ProtocolHandler = protocolHandler;
             Buffer = new byte[bufferSize];
@@ -105,7 +103,7 @@ namespace ServerLib
         /// <param name="callback">Function which will be added to OnReceiveSocketEvent event.</param>
         public ClientSocket(Socket client, int bufferSize, IProtocol<T> protocolHandler, OnReceiveSocketEventHandler<T> callback)
         {
-            Client = client;
+            Socket = client;
             //TryBindingScoket(Client);
             Buffer = new byte[bufferSize];
             ProtocolHandler = protocolHandler;
@@ -118,7 +116,7 @@ namespace ServerLib
         {
             if (OnStartListeningEvent != null)
             {
-                OnStartListeningEvent(this, new StartListeningArgs((IPEndPoint)Client.RemoteEndPoint));
+                OnStartListeningEvent(this, new StartListeningArgs((IPEndPoint)Socket.RemoteEndPoint));
             }
             Receiving();
         }
@@ -129,7 +127,7 @@ namespace ServerLib
         {
             try
             {
-                Client.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiving, null);
+                Socket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, OnReceiving, null);
             }
             catch(SocketException)
             {
@@ -142,12 +140,13 @@ namespace ServerLib
             {
                 try
                 {
-                    Client.Bind(endP);
+                    Socket.Bind(endP);
                     return;
                 }
                 catch
                 {
-                    endP = new IPEndPoint(endP.Address, ++endP.Port);
+                    endP.Port = ++endP.Port;
+                    //endP = new IPEndPoint(endP.Address, ++endP.Port);
                 }
             }
         }
@@ -159,7 +158,7 @@ namespace ServerLib
         {
             try
             {
-                int countByteTable = Client.EndReceive(result);
+                int countByteTable = Socket.EndReceive(result);
                 if (countByteTable > 0)
                 {
                     int realCountByteBuffer = GetRealCountByteBuffer(Buffer);
@@ -184,7 +183,7 @@ namespace ServerLib
         /// <param name="REP">Full Address of external host.</param>
         public void Connect(IPEndPoint REP)
         {
-            Client.Connect(REP);
+            Socket.Connect(REP);
         }
         /// <summary>
         /// Method used to connect with external host.
@@ -193,7 +192,7 @@ namespace ServerLib
         /// <param name="port">Port Connection of external host.</param>
         public void Connect(IPAddress REP,int port)
         {
-            Client.Connect(REP,port);
+            Socket.Connect(REP,port);
         }
         /// <summary>
         /// Method used to sendingan message in T type to external host. Thism ethod triggers an SendMessage event.
@@ -206,7 +205,7 @@ namespace ServerLib
                 OnSendSocketEvent(this, new SocketSendEventArgs<T>(message));
             }
             byte[] byteMessage = ProtocolHandler.EncodeProtocol(message);
-            Client.Send(byteMessage, 0, byteMessage.Length, SocketFlags.None);
+            int sendResult = Socket.Send(byteMessage, 0, byteMessage.Length, SocketFlags.None);
         }
         /// <summary>
         /// Method to disconnecting client
@@ -217,11 +216,11 @@ namespace ServerLib
             {
                 OnShutDownEvent(this, null);
             }
-            if (Client.Connected)
+            if (Socket.Connected)
             {
 
-                Client.Disconnect(false);
-                Client.Close();
+                Socket.Disconnect(false);
+                Socket.Close();
             }
             
         }
@@ -253,88 +252,51 @@ namespace ServerLib
         {
             return new ClientSocket<IProtoco, T>(socket, protocol);
         }
-        public bool RealConnect(IPAddress addr,int dPort,int startPort = 6560)
+        public bool RealConnect(IPAddress addr,int dPort)
         {
-            if (Client != null && Client.Connected)
+            if (Socket != null && Socket.Connected)
             {
                 return true;
             }
-            IPAddress[] temAddresses = Dns.GetHostEntry(Environment.MachineName).AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork).ToArray();
-            bool Completed = false;
-            while (!Completed && startPort < 6600)
+            IPAddress[] temporaryAddresses = Dns.GetHostEntry(Environment.MachineName).AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork).ToArray();
+            foreach (IPAddress temporaryIp in temporaryAddresses)
             {
                 try
                 {
-                    foreach (IPAddress temIp in temAddresses)
-                    {
-                        try
-                        {
-                            var endP = new IPEndPoint(temIp.MapToIPv4(), startPort);
-                            var s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                            s.Bind(endP);
-                            s.Connect(addr, dPort);
-                            Client = s;
-                            Receiving();
-                            return true;
-                        }
-                        catch (Exception)
-                        {
-
-                        }
-                    }
-                    if (!Completed)
-                    {
-                        throw new Exception();
-                    }
+                    var localEndPoint = new IPEndPoint(temporaryIp.MapToIPv4(), 0);
+                    var remoteEndPoint = new IPEndPoint(addr.MapToIPv4(),dPort);
+                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    socket.Bind(localEndPoint);
+                    socket.Connect(addr, dPort);
+                    Socket = socket;
+                    Receiving();
+                    return true;
                 }
-                catch
-                {
-                    startPort++;
-                    Client = null;
-                }
+                catch (Exception) { }
             }
             return false;
         }
-        public async Task<bool> RealConnectAsync(IPAddress addr,int dPort,int startPort = 6560)
+        public async Task<bool> RealConnectAsync(IPAddress addr,int dPort)
         {
-            if (Client != null && Client.Connected)
+            if (Socket != null && Socket.Connected)
             {
                 return true;
             }
-            IPAddress[] temAddresses = Dns.GetHostEntry(Environment.MachineName).AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork).ToArray();
-            bool Completed = false;
-            while (!Completed && startPort < 6600)
+            IPAddress[] temporaryAddresses = Dns.GetHostEntry(Environment.MachineName).AddressList.Where(x => x.AddressFamily == AddressFamily.InterNetwork).ToArray();
+            foreach (IPAddress temporaryIp in temporaryAddresses)
             {
                 try
                 {
-                    foreach (IPAddress temIp in temAddresses)
-                    {
-                        try
-                        {
-                            var localEndPoint = new IPEndPoint(temIp.MapToIPv4(), startPort);
-                            var remoteEndPoint = new IPEndPoint(addr.MapToIPv4(),dPort);
-                            var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                            socket.Bind(localEndPoint);
-                            await socket.ConnectAsync(addr, dPort);
-                            Client = socket;
-                            Receiving();
-                            return true;
-                        }
-                        catch (Exception)
-                        {
-
-                        }
-                    }
-                    if (!Completed)
-                    {
-                        throw new Exception();
-                    }
+                    var localEndPoint = new IPEndPoint(temporaryIp.MapToIPv4(), 0);
+                    var remoteEndPoint = new IPEndPoint(addr.MapToIPv4(),dPort);
+                    var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+                    socket.Bind(localEndPoint);
+                    await socket.ConnectAsync(addr, dPort);
+                    Socket = socket;
+                    Receiving();
+                    return true;
                 }
-                catch
-                {
-                    startPort++;
-                    Client = null;
-                }
+                catch (Exception) { }
             }
             return false;
         }
