@@ -1,0 +1,24 @@
+﻿<Window x:Class="ClientCommandServer.GetNick"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ClientCommandServer"
+        mc:Ignorable="d"
+        Title="GetNick" 
+        Height="100"
+        Width="200"
+        ResizeMode="NoResize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <TextBox Name="Nick" FontSize="20" Margin="1" TextAlignment="Center">TestNick</TextBox>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Button Name="NickConfirmed" Background="Blue" Foreground="White" FontSize="22"  Content="SEND"/>
+        </Grid>
+    </Grid>
+</Window>

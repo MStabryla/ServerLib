@@ -1,0 +1,18 @@
+﻿<Border BorderBrush="Black" Background="#FF3238BB"
+        x:Class="ClientCommandServer.Mess"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+        xmlns:local="clr-namespace:ClientCommandServer" >
+    <Grid Height="30">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="100"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Name="Source" TextAlignment="Center" FontSize="18" Margin="3" Foreground="White">Test</TextBlock>
+        <Grid Grid.Column="1">
+            <TextBlock  Name="Content" TextAlignment="Left" FontSize="15" Margin="5" Foreground="White">Test</TextBlock>
+        </Grid>
+    </Grid>
+</Border>
